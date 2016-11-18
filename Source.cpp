@@ -21,12 +21,13 @@
 #include <math.h>
 
 #define PI M_PI
-#define m1 .5//9.10938E-31 
-#define m2 5.//9.10938E-31
-#define L 1.5
+#define scale 1.0//5./.7
+#define m1 1.//9.10938E-31 
+#define m2 1.//9.10938E-31
+#define L 10.//1.4
 #define T 25
 #define sig .05
-#define grid_point 300
+#define grid_point 100
 #define pdx L/grid_point//.01401//.001 //created so that grid_point is easier to keep track of
 
 
@@ -42,11 +43,11 @@ public:
 	double h_bar = 1.0;//1.054572E-34;
 	double k1 = 110.;
 	double k2 = -110.;
-	double x_01 = .25*grid_point;
-	double x_02 = .6*grid_point;
-	double dt = 4.2E-6;
+	double x_01 = .33*grid_point;
+	double x_02 = .667*grid_point;
+	double dt = .01;
 	double dx = pdx;
-	double V_0 = 90000.;
+	double V_0 = -50000.;
 	double al = .062;
 	std::vector<std::vector<compx>> value;
 	std::vector<compx> density_x1;
@@ -83,9 +84,11 @@ wave_function::wave_function(bool init) {
 			density_x1[l] = 0;
 			density_x2[l] = 0;
 			for (int m = 0; m < grid_point; m++) {
-				value[l][m] = exp(I*compx(k1, 0)*compx(real_space(l), 0))*exp(-pow(real_space(l) - real_space(x_01), 2.) / (4.*sig*sig))
-					*exp(I*compx(k2, 0)*compx(real_space(m), 0))*exp(-pow(real_space(m) - real_space(x_02), 2.) / (4.*sig*sig));
-
+				/*value[l][m] = exp(I*compx(k1, 0)*compx(real_space(l), 0))*exp(-pow(real_space(l) - real_space(x_01), 2.) / (4.*sig*sig))
+					*exp(I*compx(k2, 0)*compx(real_space(m), 0))*exp(-pow(real_space(m) - real_space(x_02), 2.) / (4.*sig*sig));*/
+				psi00 = pow(m1 / (PI*h_bar), .25)*exp(-m1*pow((scale*real_space(l)), 2.) / (2.*h_bar))*pow(m1*3.0 / (PI*h_bar), .25)*exp(-m1*pow(scale*real_space(m), 2.) / (2.*h_bar));
+				psi10 = pow(m1 / (PI*h_bar), .25)*pow(2., .5)*pow(m1 / (h_bar), .5)*(scale*real_space(l))*exp(-m1*pow(scale*real_space(l), 2.) / (2.*h_bar))*pow(m1 / (PI*h_bar), .25)*exp(-m1*pow(scale*real_space(m), 2.) / (2.*h_bar));
+				value[l][m] = psi00 +psi10;
 			}
 		}
 		normalize();
@@ -213,19 +216,19 @@ void wave_function::solve_triag() {
 
 double wave_function::potential(int x1, int x2) {
 
-	//return .5*m1*real_space(x1)*real_space(x1) + /*.5*m1*9.*pow(real_space(x2) - real_space(x1), 2.) +*/ .5*m2*real_space(x2)*real_space(x2);
+	return .5*m1*(/*scale*/real_space(x1))*(scale*real_space(x1)) + /*.5*m1*9.*pow(real_space(x2) - real_space(x1), 2.) +*/ .5*m2*(/*scale*/real_space(x2))*(scale*real_space(x2));
 	//square well
-	if (al - abs(real_space(x1) - real_space(x2)) > 0.)
+	/*if (al - abs(real_space(x1) - real_space(x2)) > 0.)
 		return V_0;
 	else
-		return 0.0;
+		return 0.0;*/
 
 	//gaussian
 	//return V_0*exp(-pow(abs(real_space(x1)-real_space(x2)),2.)/(2.*al*al));
 }
 
 double wave_function::real_space(int index) {
-	return /*(-L/2.0) +*/ (index*dx);
+	return ((-L/2.0) + (index*dx));
 }
 
 
@@ -303,7 +306,7 @@ int main() {
 		for (int j = 0; j < grid_point; j++)
 			file5 << v.real_space(i) << "\t" << v.real_space(j) << "\t" << v.potential(i, j) << std::endl;
 	int index = 0;
-	for (double k = v.dt; k <= T; k += v.dt) {
+	for (double k = v.dt; k <= 20000*v.dt; k += v.dt) {
 		std::cout << index << std::endl;
 		/*file4.open("psi" + to_string_with_precision(k - v.dt, 6) + ".dat");
 		for (int z = 0; z < grid_point; z++) {
@@ -311,7 +314,7 @@ int main() {
 		}
 		file4.close();*/
 		v.rho();
-		if (index % 100 == 0) {
+		if (index % 200 == 0) {
 			file1.open("data_" + to_string_with_precision(index, 0) + ".dat");
 			file1 << "Time   " << k - v.dt << std::endl
 				<< "x" << "\t" << "y" << "\t" << "imag" << "\t" << "real" << "\t" << "abs" << std::endl;
