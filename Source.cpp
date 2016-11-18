@@ -21,12 +21,13 @@
 #include <math.h>
 
 #define PI M_PI
+#define scale 1.5/.5
 #define m1 .5//9.10938E-31 
 #define m2 5.//9.10938E-31
-#define L 1.5
+#define L .5//1.5
 #define T 25
 #define sig .05
-#define grid_point 300
+#define grid_point 100//300
 #define pdx L/grid_point//.01401//.001 //created so that grid_point is easier to keep track of
 
 
@@ -225,7 +226,7 @@ double wave_function::potential(int x1, int x2) {
 }
 
 double wave_function::real_space(int index) {
-	return /*(-L/2.0) +*/ (index*dx);
+	return scale*(index*dx);
 }
 
 
@@ -311,7 +312,7 @@ int main() {
 		}
 		file4.close();*/
 		v.rho();
-		if (index % 100 == 0) {
+		if (index % 10 == 0) {
 			file1.open("data_" + to_string_with_precision(index, 0) + ".dat");
 			file1 << "Time   " << k - v.dt << std::endl
 				<< "x" << "\t" << "y" << "\t" << "imag" << "\t" << "real" << "\t" << "abs" << std::endl;
