@@ -21,10 +21,10 @@
 #include <math.h>
 
 #define PI M_PI
-#define scale 1.0//5./.7
+#define scale 5./.1
 #define m1 1.//9.10938E-31 
 #define m2 1.//9.10938E-31
-#define L 10.//1.4
+#define L 0.5
 #define T 25
 #define sig .05
 #define grid_point 100
@@ -45,7 +45,7 @@ public:
 	double k2 = -110.;
 	double x_01 = .33*grid_point;
 	double x_02 = .667*grid_point;
-	double dt = .01;
+	double dt = 4.2E-06;
 	double dx = pdx;
 	double V_0 = -50000.;
 	double al = .062;
@@ -86,8 +86,8 @@ wave_function::wave_function(bool init) {
 			for (int m = 0; m < grid_point; m++) {
 				/*value[l][m] = exp(I*compx(k1, 0)*compx(real_space(l), 0))*exp(-pow(real_space(l) - real_space(x_01), 2.) / (4.*sig*sig))
 					*exp(I*compx(k2, 0)*compx(real_space(m), 0))*exp(-pow(real_space(m) - real_space(x_02), 2.) / (4.*sig*sig));*/
-				psi00 = pow(m1 / (PI*h_bar), .25)*exp(-m1*pow((scale*real_space(l)), 2.) / (2.*h_bar))*pow(m1*3.0 / (PI*h_bar), .25)*exp(-m1*pow(scale*real_space(m), 2.) / (2.*h_bar));
-				psi10 = pow(m1 / (PI*h_bar), .25)*pow(2., .5)*pow(m1 / (h_bar), .5)*(scale*real_space(l))*exp(-m1*pow(scale*real_space(l), 2.) / (2.*h_bar))*pow(m1 / (PI*h_bar), .25)*exp(-m1*pow(scale*real_space(m), 2.) / (2.*h_bar));
+				psi00 = pow(m1 / (PI*h_bar), .25)*exp(-m1*pow((real_space(l)), 2.) / (2.*h_bar))*pow(m1*3.0 / (PI*h_bar), .25)*exp(-m1*pow(real_space(m), 2.) / (2.*h_bar));
+				psi10 = pow(m1 / (PI*h_bar), .25)*pow(2., .5)*pow(m1 / (h_bar), .5)*(real_space(l))*exp(-m1*pow(real_space(l), 2.) / (2.*h_bar))*pow(m1 / (PI*h_bar), .25)*exp(-m1*pow(real_space(m), 2.) / (2.*h_bar));
 				value[l][m] = psi00 +psi10;
 			}
 		}
@@ -216,7 +216,7 @@ void wave_function::solve_triag() {
 
 double wave_function::potential(int x1, int x2) {
 
-	return .5*m1*(/*scale*/real_space(x1))*(scale*real_space(x1)) + /*.5*m1*9.*pow(real_space(x2) - real_space(x1), 2.) +*/ .5*m2*(/*scale*/real_space(x2))*(scale*real_space(x2));
+	return .5*m1*(real_space(x1))*(real_space(x1)) + /*.5*m1*9.*pow(real_space(x2) - real_space(x1), 2.) +*/ .5*m2*(real_space(x2))*(real_space(x2));
 	//square well
 	/*if (al - abs(real_space(x1) - real_space(x2)) > 0.)
 		return V_0;
@@ -228,7 +228,7 @@ double wave_function::potential(int x1, int x2) {
 }
 
 double wave_function::real_space(int index) {
-	return ((-L/2.0) + (index*dx));
+	return scale*((-L/2.0) + (index*dx));
 }
 
 
@@ -314,7 +314,7 @@ int main() {
 		}
 		file4.close();*/
 		v.rho();
-		if (index % 200 == 0) {
+		if (index % 100 == 0) {
 			file1.open("data_" + to_string_with_precision(index, 0) + ".dat");
 			file1 << "Time   " << k - v.dt << std::endl
 				<< "x" << "\t" << "y" << "\t" << "imag" << "\t" << "real" << "\t" << "abs" << std::endl;
