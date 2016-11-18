@@ -47,7 +47,7 @@ public:
 	double x_02 = .6*grid_point;
 	double dt = 4.2E-6;
 	double dx = pdx;
-	double V_0 = -90000.;
+	double V_0 = -60000./2.0;
 	double al = .062;
 	std::vector<std::vector<compx>> value;
 	std::vector<compx> density_x1;
