@@ -46,7 +46,7 @@ public:
 	double x_02 = .6*grid_point;
 	double dt = 4.2E-6;
 	double dx = pdx;
-	double V_0 = -90000.;
+	double V_0 = 90000.;
 	double al = .062;
 	std::vector<std::vector<compx>> value;
 	std::vector<compx> density_x1;
@@ -85,7 +85,7 @@ wave_function::wave_function(bool init) {
 			for (int m = 0; m < grid_point; m++) {
 				value[l][m] = exp(I*compx(k1, 0)*compx(real_space(l), 0))*exp(-pow(real_space(l) - real_space(x_01), 2.) / (4.*sig*sig))
 					*exp(I*compx(k2, 0)*compx(real_space(m), 0))*exp(-pow(real_space(m) - real_space(x_02), 2.) / (4.*sig*sig));
-				
+
 			}
 		}
 		normalize();
@@ -207,7 +207,7 @@ void wave_function::solve_triag() {
 		}
 
 	}
-	
+
 	normalize();
 }
 
